@@ -1,7 +1,9 @@
 $(document).ready(function() {
 	window.innerWidth = 0;
 	numCol;
-	
+	sbw = getScrollbarWidth();
+	console.log(sbw);
+
 	getInnerWidth();
 	main();
 
@@ -13,57 +15,41 @@ $(document).ready(function() {
 function main() {
 	var wrapperWidth = $('#myTables').width();
 	var diff = wrapperWidth - innerWidth;
-	var pad = diff/numCol;
+	var pad = diff / numCol;
 	var intPad = parseInt(pad);
-	
-	$('#myTables td:first-child').css({'padding-left':intPad+'px'});
-	// Could replace this following line with css
-	$('#myTables table:first-child td:first-child').css({'padding-left':'0px'});
 
-	/*var newInnerWidth = 0;
-	$('#myTables table').each(function(){
-		newInnerWidth += $(this).width();
-	});*/
-	//var newDiff = wrapperWidth - newInnerWidth;
+	$('#myTables td:first-child').css({'padding-left' : intPad + 'px'});
+	// Could replace this following line with css
+	$('#myTables table:first-child td:first-child').css({'padding-left' : '0px'});
+
 	var newInnerWidth = innerWidth + numCol * intPad;
-	var newDiff = wrapperWidth - newInnerWidth;
-	
-	/*var pads = Array();
-	for(i=0; i < numCol; i++){
-		pads.push(intPad);
-	}
-	console.log(pads);*/
-	/*while(newDiff > 0){
-		$('#myTables table.hasPad').each(function(index,value){
-			if(newDiff > 0){
-				//console.log($(this).find('tr td:first-child'));
-				$(this).find('tr td:first-child').each(function(index,value){
-					var currPad = parseInt($(value).css('padding-left').substring(0,2));
-					console.log(currPad);
-					$(value).css({'padding-left':currPad+1+'px'})
-					console.log(currPad+1);
-					console.log('altered padding');
-					newDiff -= 1;
-				});
-				
-			}
-		});
+	/*if (newInnerWidth > wrapperWidth - sbw){
+		console.log('scrollbar conflict!');
+		wrapperWidth -= sbw;
+		var diff = wrapperWidth - innerWidth;
+		var pad = diff / numCol;
+		var intPad = parseInt(pad);
+
+		$('#myTables td:first-child').css({'padding-left' : intPad + 'px'});
+		// Could replace this following line with css
+		$('#myTables table:first-child td:first-child').css({'padding-left' : '0px'});
 	}*/
-	while (newDiff > 0){
-		$('#myTables table.hasPad').each(function(){
-			if (newDiff > 0){
+	var newDiff = wrapperWidth - newInnerWidth;
+
+	while (newDiff > 0) {
+		$('#myTables table.hasPad').each(function() {
+			if (newDiff > 0) {
 				console.log('new table');
-				$(this).find('tr td:first-child').each(function(){
+				$(this).find('tr td:first-child').each(function() {
 					var currPad = parseInt($(this).css('padding-left').slice(0, -2));
-					$(this).css({'padding-left':currPad+1+'px'});
-					console.log(currPad + ' -> ' + (currPad+1));
-				})
+					$(this).css({'padding-left' : currPad + 1 + 'px'});
+					console.log(currPad + ' -> ' + (currPad + 1));
+				});
 				newDiff -= 1;
 			}
 		})
 	}
-	//console.log(pads);
-	
+
 	updateConsole();
 
 	function updateConsole() {
@@ -78,9 +64,23 @@ function main() {
 	}
 }
 
-function getInnerWidth(){
+function getInnerWidth() {
 	$('#myTables table').each(function(index, value) {
 		innerWidth += $(value).width();
 		numCol = index;
 	});
 }
+
+function getScrollbarWidth() {
+	// http://benalman.com/projects/jquery-misc-plugins/#scrollbarwidth
+	var parent, child, width;
+
+	if (width === undefined) {
+		parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
+		child = parent.children();
+		width = child.innerWidth() - child.height(99).innerWidth();
+		parent.remove();
+	}
+
+	return width;
+};
