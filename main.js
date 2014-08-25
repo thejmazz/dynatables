@@ -20,18 +20,20 @@ function main() {
 	// Could replace this following line with css
 	$('#myTables table:first-child td:first-child').css({'padding-left':'0px'});
 
-	var newInnerWidth = 0;
+	/*var newInnerWidth = 0;
 	$('#myTables table').each(function(){
 		newInnerWidth += $(this).width();
-	});
+	});*/
+	//var newDiff = wrapperWidth - newInnerWidth;
+	var newInnerWidth = innerWidth + numCol * intPad;
 	var newDiff = wrapperWidth - newInnerWidth;
 	
-	var pads = Array();
+	/*var pads = Array();
 	for(i=0; i < numCol; i++){
 		pads.push(intPad);
 	}
-	console.log(pads);
-	while(newDiff > 0){
+	console.log(pads);*/
+	/*while(newDiff > 0){
 		$('#myTables table.hasPad').each(function(index,value){
 			if(newDiff > 0){
 				//console.log($(this).find('tr td:first-child'));
@@ -40,22 +42,27 @@ function main() {
 					console.log(currPad);
 					$(value).css({'padding-left':currPad+1+'px'})
 					console.log(currPad+1);
+					console.log('altered padding');
 					newDiff -= 1;
 				});
+				
 			}
 		});
-	}
-	console.log(pads);
-	/*while(newDiff > 1){
-		if (newDiff > 1){
-			var curPad = parseInt($('table.hasPad td:first-child').css('padding-left').substring(0,2));
-			$('table.hasPad td:first-child').css({'padding-left':curPad+1+'px'})
-			newDiff -= 1;
-			alert('continue?');
-		}
 	}*/
-	
-	
+	while (newDiff > 0){
+		$('#myTables table.hasPad').each(function(){
+			if (newDiff > 0){
+				console.log('new table');
+				$(this).find('tr td:first-child').each(function(){
+					var currPad = parseInt($(this).css('padding-left').slice(0, -2));
+					$(this).css({'padding-left':currPad+1+'px'});
+					console.log(currPad + ' -> ' + (currPad+1));
+				})
+				newDiff -= 1;
+			}
+		})
+	}
+	//console.log(pads);
 	
 	updateConsole();
 
@@ -67,7 +74,7 @@ function main() {
 		$('#intPad').html(intPad);
 		$('#pad').html(pad);
 		$('#newInnerWidth').html(newInnerWidth);
-		$('#newDiff').html(wrapperWidth - newInnerWidth);
+		$('#newDiff').html(newDiff);
 	}
 }
 
