@@ -1,8 +1,9 @@
 $(document).ready(function() {
-	window.innerWidth = 0;
+	// Fire window resize event when scrollbar added or removed
+	hackyScrollbarResizeListener();
+	
+	innerWidth = 0;
 	numCol;
-	sbw = getScrollbarWidth();
-	console.log(sbw);
 
 	getInnerWidth();
 	main();
@@ -23,17 +24,6 @@ function main() {
 	$('#myTables table:first-child td:first-child').css({'padding-left' : '0px'});
 
 	var newInnerWidth = innerWidth + numCol * intPad;
-	/*if (newInnerWidth > wrapperWidth - sbw){
-		console.log('scrollbar conflict!');
-		wrapperWidth -= sbw;
-		var diff = wrapperWidth - innerWidth;
-		var pad = diff / numCol;
-		var intPad = parseInt(pad);
-
-		$('#myTables td:first-child').css({'padding-left' : intPad + 'px'});
-		// Could replace this following line with css
-		$('#myTables table:first-child td:first-child').css({'padding-left' : '0px'});
-	}*/
 	var newDiff = wrapperWidth - newInnerWidth;
 
 	while (newDiff > 0) {
@@ -71,16 +61,28 @@ function getInnerWidth() {
 	});
 }
 
-function getScrollbarWidth() {
-	// http://benalman.com/projects/jquery-misc-plugins/#scrollbarwidth
-	var parent, child, width;
-
-	if (width === undefined) {
-		parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
-		child = parent.children();
-		width = child.innerWidth() - child.height(99).innerWidth();
-		parent.remove();
-	}
-
-	return width;
-};
+function hackyScrollbarResizeListener(){
+	// https://gist.github.com/OrganicPanda/8222636
+	 
+	// Create an invisible iframe
+	var iframe = document.createElement('iframe');
+	iframe.id = "hacky-scrollbar-resize-listener";
+	iframe.style.cssText = 'height: 0; background-color: transparent; margin: 0; padding: 0; overflow: hidden; border-width: 0; position: absolute; width: 100%;';
+	 
+	// Register our event when the iframe loads
+	iframe.onload = function() {
+	  // The trick here is that because this iframe has 100% width 
+	  // it should fire a window resize event when anything causes it to 
+	  // resize (even scrollbars on the outer document)
+	  iframe.contentWindow.addEventListener('resize', function() {
+	    try {
+	      var evt = document.createEvent('UIEvents');
+	      evt.initUIEvent('resize', true, false, window, 0);
+	      window.dispatchEvent(evt);
+	    } catch(e) {}
+	  });
+	};
+	 
+	// Stick the iframe somewhere out of the way
+	document.body.appendChild(iframe);
+}
