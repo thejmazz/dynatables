@@ -2,6 +2,9 @@ $(document).ready(function() {
 	// Fire window resize event when scrollbar added or removed
 	hackyScrollbarResizeListener();
 	
+	genTables(5,20);
+	
+	
 	innerWidth = 0;
 	numCol;
 
@@ -22,10 +25,11 @@ function main() {
 	$('#myTables td:first-child').css({'padding-left' : intPad + 'px'});
 	// Could replace this following line with css
 	$('#myTables table:first-child td:first-child').css({'padding-left' : '0px'});
-
+	
 	var newInnerWidth = innerWidth + numCol * intPad;
 	var newDiff = wrapperWidth - newInnerWidth;
-
+	updateConsole();
+	
 	while (newDiff > 0) {
 		$('#myTables table.hasPad').each(function() {
 			if (newDiff > 0) {
@@ -52,6 +56,20 @@ function main() {
 		$('#newInnerWidth').html(newInnerWidth);
 		$('#newDiff').html(newDiff);
 	}
+}
+
+function genTables(rows, numItems){
+	var s = '<table><tbody>';
+	for (var i=0; i < numItems; i++){
+		s += '<tr><td class="des">Description</td><td class="con">content</td></tr>';
+		if ((i+1) % rows == 0 && (i+1) != numItems){
+			s += '</tbody></table><table class="hasPad"><tbody>';
+		}
+	}
+	s += '</tbody></table><div class="clear"></div>';
+	
+	$('#myTables').html(s);
+	console.log('Generated table with ' + numItems + ' items and ' + rows + ' rows.');
 }
 
 function getInnerWidth() {
